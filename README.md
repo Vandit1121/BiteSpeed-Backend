@@ -1,10 +1,3 @@
-Thanks for the clarification! Here’s an updated version of the **README** file including:
-
-1. **CockroachDB setup instructions**.
-2. **Link to your Postman documentation** for better understanding of your API.
-
----
-
 ## Setup and Installation
 
 ### Prerequisites
@@ -20,7 +13,7 @@ Ensure you have the following software installed:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/your-repo/BiteSpeed-Backend.git
+   git clone https://github.com/Vandit1121/BiteSpeed-Backend
    ```
 
 2. **Navigate into the project directory:**
