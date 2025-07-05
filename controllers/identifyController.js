@@ -14,13 +14,11 @@ function validatePhoneNumber(phoneNumber) {
 
 export const identifyController = async (req, res) => {
     const { email, phonenumber } = req.body;
-    if(!validateEmail(email))
-    {
-        res.status(400).send('Please enter valid email.');
+    if (!validateEmail(email)) {
+        return res.status(400).send({ message: 'Please enter a valid email.' });
     }
-    if(!validatePhoneNumber(phonenumber))
-    {
-        res.status(400).send('Please enter valid phone number.');
+    if (!validatePhoneNumber(phonenumber)) {
+        return res.status(400).send({ message: 'Please enter a valid phone number.' });
     }
 
     let id, emails, phoneNumbers, secondaryContactIds;
@@ -37,17 +35,16 @@ export const identifyController = async (req, res) => {
         secondaryContactIds = [];
     }
     else {
-        if(response.rows[0].email === email && response.rows[0].phonenumber === phonenumber && response.rows.length === 1)
-        {
+        if (response.rows[0].email === email && response.rows[0].phonenumber === phonenumber && response.rows.length === 1) {
             emails = [email];
             phoneNumbers = [phoneNumbers];
             secondaryContactIds = [];
         }
-        else{
+        else {
             if (response.rows[0].linkprecedence !== 'primary')
-                await executeQuery(`UPDATE contact SET linkedid = NULL, linkprecedence = 'primary', updatedAt = $1 WHERE id = $2;`, [ new Date(), response.rows[0].id]);
-            emails = response.rows.map(row => row.email);
-            phoneNumbers = response.rows.map(row => row.phonenumber);
+                await executeQuery(`UPDATE contact SET linkedid = NULL, linkprecedence = 'primary', updatedAt = $1 WHERE id = $2;`, [new Date(), response.rows[0].id]);
+            emails = [...new Set(response.rows.map(row => row.email))];
+            phoneNumbers = [...new Set(response.rows.map(row => row.phonenumber))];
             secondaryContactIds = response.rows.slice(1).map(row => row.id);
             secondaryContactIds.length > 0 && await executeQuery(`UPDATE contact SET linkedid = $1, linkprecedence = 'secondary', updatedAt = $2 WHERE id = ANY($3::uuid[]);`, [response.rows[0].id, new Date(), secondaryContactIds]);
             let sameEmailAndSamePhonenumberCheck = false;
