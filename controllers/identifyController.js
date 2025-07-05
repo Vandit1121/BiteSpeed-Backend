@@ -1,10 +1,29 @@
 import { v4 as uuidv4 } from "uuid";
 import { connectToDB, executeQuery, disconnectDB } from '../dbConnect.js';
 
+function validateEmail(email) {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+}
+
+function validatePhoneNumber(phoneNumber) {
+    const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+    return phoneRegex.test(phoneNumber);
+}
+
 
 export const identifyController = async (req, res) => {
-    let id, emails, phoneNumbers, secondaryContactIds;
     const { email, phonenumber } = req.body;
+    if(!validateEmail(email))
+    {
+        res.status(400).send('Please enter valid email.');
+    }
+    if(!validatePhoneNumber(phonenumber))
+    {
+        res.status(400).send('Please enter valid phone number.');
+    }
+
+    let id, emails, phoneNumbers, secondaryContactIds;
 
     let response = await executeQuery(
         `SELECT * FROM contact WHERE phonenumber=$1 OR email=$2 ORDER BY contact.createdat;`, [phonenumber, email]
